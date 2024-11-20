@@ -52,6 +52,9 @@ app.get('/user/no-permission', (req, res) => {
   res.render('noPermission');
 });
 
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['email', 'profile'] }));
+
 app.use('/', (req, res) => {
   res.status(404).render('notFound');
 });
