@@ -3,30 +3,10 @@ const cors = require('cors');
 const path = require('path');
 const hbs = require('express-handlebars');
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
-require('dotenv').config();
+const passportConfig = require('./config/passport');
 
 const app = express();
-
-// configure passport provider options
-passport.use(new GoogleStrategy({
-  clientID: process.env.clientID,
-  clientSecret: process.env.clientSecret,
-  callbackURL: process.env.callbackURL,
-}, (accessToken, refreshToken, profile, done) => {
-done(null, profile);
-}));
-
-// serialize user when saving to session
-passport.serializeUser((user, serialize) => {
-  serialize(null, user);
-});
-
-// deserialize user when reading from session
-passport.deserializeUser((obj, deserialize) => {
-  deserialize(null, obj);
-});
 
 app.use(session({ secret: 'anything' }));
 app.use(passport.initialize());
@@ -56,9 +36,9 @@ app.get('/auth/google',
   passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/user/no-permission' }),
-(req, res) => {
-  res.redirect('/user/logged');
-}
+  (req, res) => {
+    res.redirect('/user/logged');
+  }
 );
 
 app.use('/', (req, res) => {
