@@ -55,6 +55,12 @@ app.get('/user/no-permission', (req, res) => {
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['email', 'profile'] }));
 
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/user/no-permission' }),
+(req, res) => {
+  res.redirect('/user/logged');
+}
+);
+
 app.use('/', (req, res) => {
   res.status(404).render('notFound');
 });
