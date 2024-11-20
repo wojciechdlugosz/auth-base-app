@@ -2,8 +2,35 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const hbs = require('express-handlebars');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+require('dotenv').config();
 
 const app = express();
+
+// configure passport provider options
+passport.use(new GoogleStrategy({
+  clientID: process.env.clientID,
+  clientSecret: process.env.clientSecret,
+  callbackURL: process.env.callbackURL,
+}, (accessToken, refreshToken, profile, done) => {
+done(null, profile);
+}));
+
+// serialize user when saving to session
+passport.serializeUser((user, serialize) => {
+  serialize(null, user);
+});
+
+// deserialize user when reading from session
+passport.deserializeUser((obj, deserialize) => {
+  deserialize(null, obj);
+});
+
+app.use(session({ secret: 'anything' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.engine('hbs', hbs({ extname: 'hbs', layoutsDir: './layouts', defaultLayout: 'main' }));
 app.set('view engine', '.hbs');
